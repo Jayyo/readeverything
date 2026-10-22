@@ -1,0 +1,18 @@
+# docker compose up -d --build   (needs CONVERT_TOKEN in the environment or in .env)
+services:
+  convert:
+    build: .
+    restart: unless-stopped
+    environment:
+      CONVERT_TOKEN: ${CONVERT_TOKEN:?set CONVERT_TOKEN}
+    # Local only. For a phone outside this machine, put a TLS reverse proxy
+    # (Caddy, nginx) in front instead of publishing the port.
+    ports:
+      - "127.0.0.1:3000:3000"
+    mem_limit: 2g
+    pids_limit: 256
+    read_only: true
+    # Scratch space and LibreOffice's profile, size-capped and gone on restart.
+    tmpfs:
+      - /tmp:size=256m
+      - /home/convert:size=1g,uid=10001,gid=10001,mode=0700
