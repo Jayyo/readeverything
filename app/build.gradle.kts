@@ -50,17 +50,13 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.activity:activity-compose:1.9.3")
-    implementation("androidx.documentfile:documentfile:1.0.1")
 
     implementation(platform("androidx.compose:compose-bom:2024.12.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.navigation:navigation-compose:2.8.5")
 
     // Image loading + SVG + GIF (Coil 3)
     implementation("io.coil-kt.coil3:coil-compose:3.2.0")
@@ -79,10 +75,6 @@ dependencies {
 
     // RTF parsing (text extraction)
     implementation("com.github.joniles:rtfparserkit:1.16.0")
-
-    // HWP / HWPX offline text-extraction fallback
-    implementation("kr.dogfoot:hwplib:1.1.9")
-    implementation("kr.dogfoot:hwpxlib:1.0.5")
 
     // Networking for the conversion server (office/hwp -> pdf)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
