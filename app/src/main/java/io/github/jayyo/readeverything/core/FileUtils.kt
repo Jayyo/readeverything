@@ -4,34 +4,50 @@ import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
+import java.security.DigestInputStream
 import java.security.MessageDigest
+import java.util.UUID
+
+class TooLargeException(val limit: Long) : IOException("larger than $limit bytes")
 
 object FileUtils {
 
-    fun readBytes(resolver: ContentResolver, uri: Uri): ByteArray =
-        resolver.openInputStream(uri)?.use { it.readBytes() } ?: ByteArray(0)
+    /** Whole stream into memory, refusing anything over [limit] bytes. */
+    fun readBytes(resolver: ContentResolver, uri: Uri, limit: Long): ByteArray =
+        (resolver.openInputStream(uri) ?: throw IOException("cannot open $uri")).use { readLimited(it, limit) }
+
+    fun readLimited(input: InputStream, limit: Long): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(64 * 1024)
+        var total = 0L
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            total += n
+            if (total > limit) throw TooLargeException(limit)
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
+    }
 
     /** Read up to [n] bytes from the head of the stream. */
     fun readHead(resolver: ContentResolver, uri: Uri, n: Int): ByteArray =
         resolver.openInputStream(uri)?.use { ins ->
             val buf = ByteArray(n)
-            val read = ins.readFully(buf)
-            if (read == n) buf else buf.copyOf(read)
+            var off = 0
+            while (off < n) {
+                val r = ins.read(buf, off, n - off)
+                if (r < 0) break
+                off += r
+            }
+            if (off == n) buf else buf.copyOf(off)
         } ?: ByteArray(0)
 
-    private fun InputStream.readFully(buf: ByteArray): Int {
-        var off = 0
-        while (off < buf.size) {
-            val r = read(buf, off, buf.size - off)
-            if (r < 0) break
-            off += r
-        }
-        return off
-    }
-
+    /** Name for display only; it never becomes a path. */
     fun displayName(resolver: ContentResolver, uri: Uri): String {
         if (uri.scheme == "file") return uri.lastPathSegment ?: "file"
         var name: String? = null
@@ -46,14 +62,30 @@ object FileUtils {
         return name ?: uri.lastPathSegment ?: "document"
     }
 
+    /** Copy until EOF, failing past [limit] bytes; [checkActive] runs between chunks. */
+    fun copyLimited(input: InputStream, out: java.io.OutputStream, limit: Long, checkActive: () -> Unit = {}) {
+        val buf = ByteArray(64 * 1024)
+        var total = 0L
+        while (true) {
+            checkActive()
+            val n = input.read(buf)
+            if (n < 0) break
+            total += n
+            if (total > limit) throw TooLargeException(limit)
+            out.write(buf, 0, n)
+        }
+    }
+
     fun extensionOf(name: String): String = name.substringAfterLast('.', "").lowercase()
 
     fun sha256(bytes: ByteArray): String =
-        MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+        MessageDigest.getInstance("SHA-256").digest(bytes).toHex()
+
+    private fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
 
     /**
-     * Decode bytes to text. Sniffs BOM first, then tries strict UTF-8, then falls back to
-     * MS949 (CP949/EUC-KR superset) — the #1 Korean text-encoding case from Excel/Notepad exports.
+     * Decode bytes to text. Sniffs a BOM first, then tries strict UTF-8, then falls back to
+     * MS949 (CP949/EUC-KR superset), the usual encoding of Korean files saved by Excel or Notepad.
      */
     fun decodeText(bytes: ByteArray): String {
         if (bytes.size >= 3 && bytes[0] == 0xEF.toByte() && bytes[1] == 0xBB.toByte() && bytes[2] == 0xBF.toByte())
@@ -72,12 +104,29 @@ object FileUtils {
             .getOrElse { String(bytes, Charsets.ISO_8859_1) }
     }
 
-    /** Copy a content uri into the app cache so it can be opened as a seekable File (PdfRenderer). */
-    fun copyToCache(resolver: ContentResolver, uri: Uri, cacheDir: File, fileName: String): File {
+    /**
+     * Copy a content URI into the app cache so PdfRenderer gets a seekable file.
+     * The cache file is named after the content hash: two different files with
+     * the same display name never overwrite each other.
+     */
+    fun copyToCache(resolver: ContentResolver, uri: Uri, cacheDir: File, limit: Long,
+                    checkActive: () -> Unit = {}): File {
         val dir = File(cacheDir, "imports").apply { mkdirs() }
-        val safe = fileName.replace(Regex("[^A-Za-z0-9._-]"), "_").ifEmpty { "doc" }
-        val out = File(dir, safe)
-        resolver.openInputStream(uri)?.use { ins -> out.outputStream().use { ins.copyTo(it) } }
-        return out
+        val tmp = File(dir, "${UUID.randomUUID()}.part")
+        val md = MessageDigest.getInstance("SHA-256")
+        try {
+            (resolver.openInputStream(uri) ?: throw IOException("cannot open $uri")).use { ins ->
+                DigestInputStream(ins, md).use { din -> tmp.outputStream().use { copyLimited(din, it, limit, checkActive) } }
+            }
+            val out = File(dir, md.digest().toHex() + ".pdf")
+            if (out.exists() && out.length() == tmp.length()) {
+                tmp.delete()
+            } else if (!tmp.renameTo(out)) {
+                throw IOException("cannot move ${tmp.name}")
+            }
+            return out
+        } finally {
+            tmp.delete()
+        }
     }
 }

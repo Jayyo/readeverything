@@ -2,8 +2,8 @@ package io.github.jayyo.readeverything.core
 
 /**
  * The detected logical type of a document, used to route to the right renderer.
- * Types whose [needsConversion] is true are sent to the conversion server and
- * shown through the shared PDF viewer; everything else renders on-device.
+ * Types with a [conversionExt] go to the conversion server and come back as PDF;
+ * everything else renders on the device.
  */
 sealed class DocType(val label: String) {
     object Pdf : DocType("PDF")
@@ -15,14 +15,19 @@ sealed class DocType(val label: String) {
     object Rtf : DocType("RTF")
     class Text(val sub: String) : DocType("Text")
 
-    // Binary office / Hangul formats that require the LibreOffice conversion server.
-    class Office(val kind: String) : DocType(kind) // DOC, DOCX, PPT, PPTX, XLS, XLSX
+    /** doc, docx, ppt, pptx, xls, xlsx, odt, odp, ods */
+    class Office(val ext: String) : DocType(ext.uppercase())
     object Hwp : DocType("HWP")
     object Hwpx : DocType("HWPX")
 
     class Unknown(val mime: String?) : DocType("Unknown")
 
-    /** True when on-device rendering is not faithful and the server must produce a PDF. */
-    val needsConversion: Boolean
-        get() = this is Office || this is Hwp || this is Hwpx
+    /** File extension to send to the server, or null when this renders on the device. */
+    val conversionExt: String?
+        get() = when (this) {
+            is Office -> ext
+            is Hwp -> "hwp"
+            is Hwpx -> "hwpx"
+            else -> null
+        }
 }

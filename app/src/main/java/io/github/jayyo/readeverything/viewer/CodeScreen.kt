@@ -10,7 +10,8 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -25,13 +26,20 @@ import dev.snipme.highlights.model.BoldHighlight
 import dev.snipme.highlights.model.ColorHighlight
 import dev.snipme.highlights.model.SyntaxLanguage
 import dev.snipme.highlights.model.SyntaxThemes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private val CodeBg = Color(0xFF1E1E1E)
 private val CodeFg = Color(0xFFE6E6E6)
+private const val MAX_HIGHLIGHT_CHARS = 300_000   // bigger files show as plain monospace
 
+/** This composes the whole file as one Text, so big files go to [TextScreen] instead. */
 @Composable
 fun CodeScreen(text: String, ext: String, modifier: Modifier = Modifier) {
-    val annotated = remember(text, ext) { highlight(text, ext) }
+    if (text.length > MAX_HIGHLIGHT_CHARS) return TextScreen(text, monospace = true, modifier = modifier)
+    val annotated by produceState(AnnotatedString(text), text, ext) {
+        value = withContext(Dispatchers.Default) { highlight(text, ext) }
+    }
     val v = rememberScrollState()
     val h = rememberScrollState()
     SelectionContainer {

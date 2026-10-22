@@ -11,3 +11,4 @@ __pycache__/
 *.aab
 *.jks
 *.keystore
+.pytest_cache/

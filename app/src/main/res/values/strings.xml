@@ -1,3 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Readeverything</string>
+    <string name="app_name" translatable="false">Readeverything</string>
+
+    <string name="home_tagline">Opens the documents people send you, without an app for each format.</string>
+    <string name="action_open_file">Open a file</string>
+    <string name="home_on_device_title">On this phone</string>
+    <string name="home_on_device_formats">PDF · images · text and logs · Markdown · CSV/TSV · JSON · source code · RTF (text only)</string>
+    <string name="home_server_title">Through your conversion server</string>
+    <string name="home_server_formats">Word · Excel · PowerPoint · OpenDocument · HWP · HWPX, shown as PDF</string>
+    <string name="home_server_set">Server: %1$s</string>
+    <string name="home_server_unset">No server set. These files ask before anything is uploaded.</string>
+    <string name="action_server_settings">Server settings</string>
+
+    <string name="action_back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+    <string name="action_retry">Try again</string>
+    <string name="err_no_file">There is no file to open.</string>
+    <string name="loading_document">Reading the file…</string>
+    <string name="empty_file">(empty file)</string>
+
+    <string name="settings_title">Conversion server</string>
+    <string name="settings_intro">Office and HWP files are converted to PDF by a server you run (see server/ in the project). Each file is uploaded only after you confirm it.</string>
+    <string name="settings_url">Server address</string>
+    <string name="settings_token">Token</string>
+    <string name="settings_allow_http">Allow unencrypted HTTP</string>
+    <string name="settings_allow_http_hint">Only for a server on your own network. Documents and the token travel in the clear.</string>
+    <string name="settings_testing">Checking…</string>
+    <string name="settings_test_ok">The server answered and accepted the token.</string>
+    <string name="action_test">Test</string>
+    <string name="action_save">Save</string>
+    <string name="action_remove_server">Remove this server</string>
+    <string name="url_empty">Enter the server address.</string>
+    <string name="url_scheme">The address must start with https:// or http://.</string>
+    <string name="url_credentials">Put the token in the token field, not in the address.</string>
+    <string name="url_query">The address can\'t have ? or # parts.</string>
+    <string name="token_invalid">The token can only contain letters, digits and ASCII symbols, without spaces.</string>
+    <string name="err_not_a_server">That address answered, but not like a working conversion server.</string>
+    <string name="url_invalid">That doesn\'t look like a web address.</string>
+
+    <string name="convert_needs_server_title">%1$s needs a conversion server</string>
+    <string name="convert_needs_server_body">This format is shown by converting it to PDF on a server you run. No server is set up yet.</string>
+    <string name="action_set_up_server">Set up a server</string>
+    <string name="convert_ask_title">Convert this %1$s file?</string>
+    <string name="convert_ask_body">To show “%1$s”, the whole file is sent to %2$s and comes back as a PDF. Whoever runs that server can read it.</string>
+    <string name="convert_ask_insecure">This server uses plain HTTP, so the file is not encrypted on the way.</string>
+    <string name="action_upload_and_open">Upload and open</string>
+    <string name="convert_uploading">Converting the %1$s file on %2$s…</string>
+    <string name="convert_failed_title">The %1$s file could not be converted</string>
+
+    <string name="err_empty_response">The server sent an empty answer.</string>
+    <string name="err_not_pdf">The server did not send back a PDF.</string>
+    <string name="err_network">Couldn\'t reach the server: %1$s</string>
+    <string name="err_http_not_allowed">This server uses plain HTTP. Allow it in the server settings, or use https.</string>
+    <string name="err_http_auth">The server didn\'t accept the token.</string>
+    <string name="err_http_too_large">The file is larger than the server accepts.</string>
+    <string name="err_http_type">The server doesn\'t accept this type of file.</string>
+    <string name="err_http_failed">The server couldn\'t convert this file. It may be damaged or password-protected.</string>
+    <string name="err_http_busy">The server is busy. Try again in a moment.</string>
+    <string name="err_http_timeout">The conversion took too long.</string>
+    <string name="err_http_redirect">The server tried to redirect the upload. Check the address.</string>
+    <string name="err_http_other">The server answered with an error (HTTP %1$d).</string>
+
+    <string name="err_too_large">This file is too large to show here (limit %1$d MB).</string>
+    <string name="err_permission">This app wasn\'t given permission to read the file.</string>
+    <string name="err_gone">The file is no longer available.</string>
+    <string name="err_open">Couldn\'t open the file: %1$s</string>
+    <string name="err_pdf_locked">This PDF is password-protected.</string>
+    <string name="err_pdf">Couldn\'t open the PDF: %1$s</string>
+    <string name="err_page">Couldn\'t draw page %1$d</string>
+    <string name="page_n">Page %1$d</string>
+    <string name="err_image">Couldn\'t decode this image.</string>
+    <string name="csv_truncated">Showing the first %1$d rows.</string>
+    <string name="unsupported">This format isn\'t supported yet: %1$s</string>
+    <string name="unsupported_unknown">This file type isn\'t supported.</string>
 </resources>

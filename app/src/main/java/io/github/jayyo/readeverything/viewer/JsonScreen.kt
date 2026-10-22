@@ -14,7 +14,8 @@ fun JsonScreen(text: String, modifier: Modifier = Modifier) {
     JsonTree(
         json = text,
         onLoading = { CenterLoading() },
-        initialState = TreeState.FIRST_ITEM_EXPANDED,
+        // Small documents open fully expanded; big ones only show the top level.
+        initialState = if (text.length < 20_000) TreeState.EXPANDED else TreeState.FIRST_ITEM_EXPANDED,
         modifier = modifier.fillMaxSize().padding(8.dp),
     )
 }

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<paths>
-    <cache-path name="shared" path="shared/" />
-    <cache-path name="converted" path="converted/" />
-    <cache-path name="imports" path="imports/" />
-    <files-path name="documents" path="documents/" />
-</paths>
