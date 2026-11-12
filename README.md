@@ -9,7 +9,7 @@ An Android viewer for the documents people send you: PDF, Markdown, CSV, JSON, s
 <img src="docs/hwpx.webp" width="200" alt="The HWPX file rendered as PDF">
 </p>
 
-In Korea a lot of paperwork still arrives as `.hwp` or `.hwpx`, and on a phone that usually means installing the Hancom viewer next to a PDF app, an Office app and a text editor. I wanted one "Open with" target that figures out what a file actually is and shows it.
+In June 2026 I got tired of opening documents on my phone: PDFs went through Google Drive, HWP files needed Polaris Office, and Markdown or code opened as plain text in whatever app took it. I wanted one "Open with" target that figures out what a file actually is and shows it, with no ads or login.
 
 [한국어 설명은 아래에 있습니다.](#한국어)
 
@@ -80,6 +80,8 @@ The app and the server are MIT, see [LICENSE](LICENSE). H2Orestart, which the Do
 ## 한국어
 
 받은 문서를 형식마다 다른 앱 없이 열어 보는 안드로이드 뷰어입니다. PDF·마크다운·CSV·JSON·코드·텍스트는 폰에서 바로 열고, 워드·엑셀·파워포인트와 한글(HWP/HWPX) 파일은 직접 띄운 변환 서버에서 PDF로 바꿔서 보여 줍니다.
+
+2026년 6월, 폰에서 문서 여는 게 너무 번거로워서 만들었습니다. PDF는 구글 드라이브를 거쳐야 했고, hwp는 폴라리스 오피스가 필요했고, 마크다운이나 코드는 아무 앱에서나 그냥 글자로 열렸습니다. 수정까지는 필요 없고, 광고·로그인 없이 "다른 앱으로 열기"에서 무엇이든 열리는 앱 하나를 원했습니다.
 
 - 파일 이름이나 MIME 타입보다 실제 바이트를 먼저 봅니다. 확장자가 없거나 `application/octet-stream`으로 와도 HWP·HWPX·DOCX를 구분합니다.
 - 서버로 보내야 하는 파일은 어디로 보내는지 보여 주고 "업로드하고 열기"를 누를 때만 보냅니다. 한 번 변환한 파일은 내용 해시로 캐시해서 다시 열 때는 업로드하지 않습니다.
